@@ -68,7 +68,7 @@ namespace FoodDelivery.Services
             };
         }
 
-        public async Task<bool> OrderPaidAsync(int orderId)
+        public async Task<bool> OrderPayAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status != "Создан")
@@ -82,7 +82,7 @@ namespace FoodDelivery.Services
         public async Task<bool> CancelOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
-            if (order == null || order.Status != "Создан")
+            if (order == null || order.Status == "Доставлен")
                 return false;
 
             order.Status = "Отменен";
@@ -144,6 +144,41 @@ namespace FoodDelivery.Services
                     Price = x.Dish.Price
                 }).ToList()
             };
+        }
+
+        public async Task<IEnumerable<OrderResponseDTO>> GetPaidOrdersAsync()
+        {
+            var orders = await _context.Orders
+                .Where(o => o.Status == "Оплачен")
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Dish)
+                .ToListAsync();
+
+            return orders.Select(o => new OrderResponseDTO
+            {
+                OrderId = o.OrderId,
+                TotalPrice = o.TotalPrice,
+                Status = o.Status,
+                DateTime = o.DateTime,
+                DeliveryAddress = o.DeliveryAddress,
+                Items = o.OrderDetails.Select(od => new OrderItemDTO
+                {
+                    DishId = od.DishId,
+                    DishName = od.Dish.Name,
+                    Quantity = od.Quantity
+                }).ToList()
+            });
+        }
+
+        public async Task<bool> OrderGivenToCourierAsync(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null || order.Status != "Оплачен")
+                return false;
+
+            order.Status = "Передан курьеру";
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

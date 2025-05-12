@@ -8,7 +8,6 @@ namespace FoodDelivery.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -20,6 +19,19 @@ namespace FoodDelivery.Controllers
 
         private int GetClientId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetClientOrders()
+        {
+            var clientId = GetClientId();
+            var orders = await _orderService.GetClientOrdersAsync(clientId);
+            return Ok(orders);
+        }
+
+        [HttpGet("paid")]
+        public async Task<IActionResult> GetPaidOrdersWithDetails() => Ok(await _orderService.GetPaidOrdersAsync());
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] string deliveryAddress)
         {
@@ -34,35 +46,28 @@ namespace FoodDelivery.Controllers
         }
 
         [HttpPost("{orderId}/pay")]
-        public async Task<IActionResult> MarkAsPaid(int orderId)
+        public async Task<IActionResult> MarkOrderAsPaid(int orderId)
         {
-            return await _orderService.OrderPaidAsync(orderId)
+            return await _orderService.OrderPayAsync(orderId)
                 ? Ok() : BadRequest();
         }
 
         [HttpPost("{orderId}/cancel")]
-        public async Task<IActionResult> Cancel(int orderId)
+        public async Task<IActionResult> CancelOrder(int orderId)
         {
             return await _orderService.CancelOrderAsync(orderId)
                 ? Ok() : BadRequest();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetClientOrders()
-        {
-            var clientId = GetClientId();
-            var orders = await _orderService.GetClientOrdersAsync(clientId);
-            return Ok(orders);
-        }
-
         [Authorize]
         [HttpPost("{orderId}/deliver")]
-        public async Task<IActionResult> Deliver(int orderId)
+        public async Task<IActionResult> MarkOrdeAsrDelivered(int orderId)
         {
             return await _orderService.OrderDeliveredAsync(orderId)
                 ? Ok() : BadRequest();
         }
 
+        [Authorize]
         [HttpGet("{orderId}")]
         public async Task<IActionResult> GetOrderDetails(int orderId)
         {
@@ -76,6 +81,13 @@ namespace FoodDelivery.Controllers
             }
 
             return Ok(order);
+        }
+
+        [HttpPost("{orderId}/courier")]
+        public async Task<IActionResult> OrderGivenToCourier(int orderId)
+        {
+            return await _orderService.OrderGivenToCourierAsync(orderId)
+                ? Ok() : BadRequest();
         }
     }
 }
