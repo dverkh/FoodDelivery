@@ -35,7 +35,8 @@ namespace FoodDelivery.Services
                 Password = hashedPassword,
                 Name = dto.Name,
                 Phone = dto.Phone,
-                LastPasswordUpdateTime = DateTime.UtcNow
+                LastPasswordUpdateTime = DateTime.UtcNow,
+                Role = "Client"
             };
 
             _context.Clients.Add(client);

@@ -9,8 +9,7 @@ namespace FoodDelivery.Domain.Contracts
         Task<bool> OrderPayAsync(int orderId);
         Task<bool> CancelOrderAsync(int orderId);
         Task<bool> OrderDeliveredAsync(int orderId);
-        Task<List<OrderListDTO>> GetClientOrdersAsync(int clientId);
-        Task<OrderResponseDTO> GetOrderDetailsAsync(int orderId);
+        Task<List<OrderResponseDTO>> GetClientOrdersAsync(int clientId);
         Task<IEnumerable<OrderResponseDTO>> GetPaidOrdersAsync();
         Task<bool> OrderGivenToCourierAsync(int orderId);
     }

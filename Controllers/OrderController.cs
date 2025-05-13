@@ -19,8 +19,8 @@ namespace FoodDelivery.Controllers
 
         private int GetClientId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        [Authorize]
-        [HttpGet]
+        [Authorize(Roles = "Client")]
+        [HttpGet()]
         public async Task<IActionResult> GetClientOrders()
         {
             var clientId = GetClientId();
@@ -28,10 +28,11 @@ namespace FoodDelivery.Controllers
             return Ok(orders);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("paid")]
-        public async Task<IActionResult> GetPaidOrdersWithDetails() => Ok(await _orderService.GetPaidOrdersAsync());
+        public async Task<IActionResult> GetPaidOrders() => Ok(await _orderService.GetPaidOrdersAsync());
 
-        [Authorize]
+        [Authorize(Roles = "Client")]
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] string deliveryAddress)
         {
@@ -45,6 +46,7 @@ namespace FoodDelivery.Controllers
             return Ok(order);
         }
 
+
         [HttpPost("{orderId}/pay")]
         public async Task<IActionResult> MarkOrderAsPaid(int orderId)
         {
@@ -52,6 +54,7 @@ namespace FoodDelivery.Controllers
                 ? Ok() : BadRequest();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("{orderId}/cancel")]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
@@ -67,22 +70,7 @@ namespace FoodDelivery.Controllers
                 ? Ok() : BadRequest();
         }
 
-        [Authorize]
-        [HttpGet("{orderId}")]
-        public async Task<IActionResult> GetOrderDetails(int orderId)
-        {
-            var clientId = GetClientId();
-            var order = await _orderService.GetOrderDetailsAsync(orderId);
-
-            if (order == null || (await _orderService.GetClientOrdersAsync(clientId))
-                .All(x => x.OrderId != orderId))
-            {
-                return NotFound();
-            }
-
-            return Ok(order);
-        }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("{orderId}/courier")]
         public async Task<IActionResult> OrderGivenToCourier(int orderId)
         {

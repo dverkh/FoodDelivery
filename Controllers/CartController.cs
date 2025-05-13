@@ -8,7 +8,7 @@ namespace FoodDelivery.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Client")]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;

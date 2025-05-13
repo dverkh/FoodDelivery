@@ -8,6 +8,7 @@
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public DateTime LastPasswordUpdateTime {get; set; }
+        public string Role { get; set; }
 
         public ICollection<Order> Orders { get; set; }
         public ICollection<CartItem> CartItems { get; set; }

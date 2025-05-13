@@ -2,6 +2,7 @@
 using FoodDelivery.Domain.Models;
 using FoodDelivery.Domain.Contracts;
 using FoodDelivery.DTO.DishDTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodDelivery.Controllers
 {
@@ -23,6 +24,7 @@ namespace FoodDelivery.Controllers
             return Ok(dishes);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("dish")]
         public async Task<IActionResult> AddDish([FromBody] DishDTO dishDto)
         {
@@ -30,6 +32,7 @@ namespace FoodDelivery.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("category")]
         public async Task<IActionResult> AddCategory([FromBody] string name)
         {
@@ -37,6 +40,7 @@ namespace FoodDelivery.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("dish/{id}")]
         public async Task<IActionResult> UpdateDish(int id, [FromBody] DishDTO dishDto)
         {
@@ -51,6 +55,7 @@ namespace FoodDelivery.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("category/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, string newName)
         {

@@ -101,49 +101,30 @@ namespace FoodDelivery.Services
             return true;
         }
 
-        public async Task<List<OrderListDTO>> GetClientOrdersAsync(int clientId)
+        public async Task<List<OrderResponseDTO>> GetClientOrdersAsync(int clientId)
         {
-            return await _context.Orders
-                .Where(x => x.ClientId == clientId)
-                .OrderByDescending(x => x.DateTime)
-                .Select(x => new OrderListDTO
-                {
-                    OrderId = x.OrderId,
-                    Status = x.Status,
-                    TotalPrice = x.TotalPrice,
-                    DateTime = x.DateTime,
-                    DeliveryAddress = x.DeliveryAddress
-                })
+            var orders = await _context.Orders
+                .Where(o => o.ClientId == clientId)
+                .OrderByDescending(o => o.DateTime)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Dish)
                 .ToListAsync();
-        }
 
-        public async Task<OrderResponseDTO> GetOrderDetailsAsync(int orderId)
-        {
-            var order = await _context.Orders
-                .Include(x => x.OrderDetails)
-                .ThenInclude(x => x.Dish)
-                .FirstOrDefaultAsync(x => x.OrderId == orderId);
-
-            if (order == null)
-            {
-                throw new KeyNotFoundException("Заказ не найден");
-            }
-
-            return new OrderResponseDTO
+            return orders.Select(order => new OrderResponseDTO
             {
                 OrderId = order.OrderId,
                 Status = order.Status,
                 TotalPrice = order.TotalPrice,
                 DateTime = order.DateTime,
                 DeliveryAddress = order.DeliveryAddress,
-                Items = order.OrderDetails.Select(x => new OrderItemDTO
+                Items = order.OrderDetails.Select(od => new OrderItemDTO
                 {
-                    DishId = x.DishId,
-                    DishName = x.Dish.Name,
-                    Quantity = x.Quantity,
-                    Price = x.Dish.Price
+                    DishId = od.DishId,
+                    DishName = od.Dish.Name,
+                    Quantity = od.Quantity,
+                    Price = od.Dish.Price
                 }).ToList()
-            };
+            }).ToList();
         }
 
         public async Task<IEnumerable<OrderResponseDTO>> GetPaidOrdersAsync()
