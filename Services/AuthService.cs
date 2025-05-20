@@ -14,11 +14,6 @@ namespace FoodDelivery.Services
         private readonly FoodDeliveryContext _context;
         private readonly IAuthTokenService _authTokenService;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр сервиса аутентификации
-        /// </summary>
-        /// <param name="context">Контекст базы данных</param>
-        /// <param name="AuthTokenService">Сервис для работы с токенами</param>
         public AuthService(FoodDeliveryContext context, IAuthTokenService AuthTokenService)
         {
             _context = context;

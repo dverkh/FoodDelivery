@@ -14,11 +14,6 @@ namespace FoodDelivery.Services
         private readonly FoodDeliveryContext _context;
         private readonly ICartService _cartService;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр сервиса заказов
-        /// </summary>
-        /// <param name="context">Контекст базы данных</param>
-        /// <param name="cartService">Сервис корзины</param>
         public OrderService(FoodDeliveryContext context, ICartService cartService)
         {
             _context = context;
@@ -193,14 +188,20 @@ namespace FoodDelivery.Services
         /// Отмечает заказ как переданный курьеру
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
+        /// /// <param name="courierId">Идентификатор курьера</param>
         /// <returns>true если статус успешно обновлен, иначе false</returns>
-        public async Task<bool> OrderGivenToCourierAsync(int orderId)
+        public async Task<bool> OrderGivenToCourierAsync(int orderId, int courierId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status != "Оплачен")
                 return false;
 
+            var courierExists = await _context.Couriers.AnyAsync(c => c.CourierId == courierId);
+            if (!courierExists)
+                return false;
+
             order.Status = "Передан курьеру";
+            order.CourierId = courierId;
             await _context.SaveChangesAsync();
             return true;
         }

@@ -25,6 +25,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IAuthTokenService, AuthTokenService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICourierService, CourierService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

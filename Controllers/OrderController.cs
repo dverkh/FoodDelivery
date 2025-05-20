@@ -103,9 +103,9 @@ namespace FoodDelivery.Controllers
         /// <returns>Результат операции передачи курьеру</returns>
         [Authorize(Roles = "Admin")]
         [HttpPut("{orderId}/courier")]
-        public async Task<IActionResult> OrderGivenToCourier(int orderId)
+        public async Task<IActionResult> OrderGivenToCourier(int orderId, [FromQuery] int courierId)
         {
-            return await _orderService.OrderGivenToCourierAsync(orderId)
+            return await _orderService.OrderGivenToCourierAsync(orderId, courierId)
                 ? Ok("Заказ отмечен как переданный курьеру") : BadRequest();
         }
 

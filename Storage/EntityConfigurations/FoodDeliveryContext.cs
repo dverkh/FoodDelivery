@@ -17,6 +17,7 @@ namespace FoodDelivery.Storage.EntityConfigurations
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
+        public DbSet<Courier> Couriers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

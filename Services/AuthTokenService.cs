@@ -16,10 +16,6 @@ namespace FoodDelivery.Services
     {
         private readonly FoodDeliveryContext _context;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр сервиса токенов
-        /// </summary>
-        /// <param name="context">Контекст базы данных</param>
         public AuthTokenService(FoodDeliveryContext context)
         {
             _context = context;

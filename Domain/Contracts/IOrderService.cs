@@ -54,6 +54,6 @@ namespace FoodDelivery.Domain.Contracts
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
         /// <returns>true если статус успешно обновлен, иначе false</returns>
-        Task<bool> OrderGivenToCourierAsync(int orderId);
+        Task<bool> OrderGivenToCourierAsync(int orderId, int courierId);
     }
 }
