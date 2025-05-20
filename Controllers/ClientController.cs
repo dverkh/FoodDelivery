@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FoodDelivery.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления данными и операциями клиента
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Client")]
@@ -18,8 +21,16 @@ namespace FoodDelivery.Controllers
             _clientService = clientService;
         }
 
+        /// <summary>
+        /// Получает идентификатор клиента из токена доступа
+        /// </summary>
+        /// <returns>Идентификатор авторизованного клиента</returns>
         private int GetClientId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        /// <summary>
+        /// Получает информацию профиля клиента
+        /// </summary>
+        /// <returns>Ответ OK с данными клиента</returns>
         [HttpGet]
         public async Task<IActionResult> GetClient()
         {
@@ -28,21 +39,37 @@ namespace FoodDelivery.Controllers
             return Ok(client);
         }
 
+        /// <summary>
+        /// Обновляет отображаемое имя клиента
+        /// </summary>
+        /// <param name="newName">Новое отображаемое имя клиента</param>
+        /// <returns>Ответ OK при успешном обновлении имени</returns>
         [HttpPut("name")]
         public async Task<IActionResult> UpdateName([FromBody] string newName)
         {
             var clientId = GetClientId();
             await _clientService.UpdateNameAsync(clientId, newName);
-            return Ok();
+            return Ok("Имя изменено");
         }
 
+        /// <summary>
+        /// Обновляет номер телефона клиента
+        /// </summary>
+        /// <param name="newPhone">Новый номер телефона клиента</param>
+        /// <returns>Ответ OK при успешном обновлении номера телефона</returns>
         [HttpPut("phone")]
         public async Task<IActionResult> UpdatePhone([FromBody] string newPhone)
         {
             var clientId = GetClientId();
             await _clientService.UpdatePhoneAsync(clientId, newPhone);
-            return Ok();
+            return Ok("Телефон изменен");
         }
+
+        /// <summary>
+        /// Обновляет пароль клиента после проверки старого пароля
+        /// </summary>
+        /// <param name="dto">DTO, содержащий старый и новый пароли</param>
+        /// <returns>Ответ OK при успешной смене пароля или BadRequest с соответствующим сообщением об ошибке</returns>
         [HttpPut("password")]
         public async Task<IActionResult> UpdatePassword([FromBody] PasswordUpdateDTO dto)
         {

@@ -6,6 +6,9 @@ using FoodDelivery.DTO.CartDTO;
 
 namespace FoodDelivery.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления корзиной покупок клиента
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Client")]
@@ -13,13 +16,25 @@ namespace FoodDelivery.Controllers
     {
         private readonly ICartService _cartService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера корзины
+        /// </summary>
+        /// <param name="cartService">Сервис корзины</param>
         public CartController(ICartService cartService)
         {
             _cartService = cartService;
         }
 
+        /// <summary>
+        /// Получает идентификатор текущего клиента из токена
+        /// </summary>
+        /// <returns>Идентификатор клиента</returns>
         private int GetClientId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        /// <summary>
+        /// Получает содержимое корзины текущего клиента
+        /// </summary>
+        /// <returns>Список товаров в корзине</returns>
         [HttpGet]
         public async Task<IActionResult> GetCart()
         {
@@ -28,36 +43,55 @@ namespace FoodDelivery.Controllers
             return Ok(cart);
         }
 
-        [HttpPost]
+        /// <summary>
+        /// Добавляет блюдо в корзину
+        /// </summary>
+        /// <param name="dishId">Идентификатор блюда</param>
+        /// <returns>Результат операции добавления</returns>
+        [HttpPost("{dishId}")]
         public async Task<IActionResult> AddToCart(int dishId)
         {
             var clientId = GetClientId();
             await _cartService.AddToCartAsync(clientId, dishId);
-            return Ok();
+            return Ok("Блюдо добавлено в корзину");
         }
 
+        /// <summary>
+        /// Обновляет количество блюда в корзине
+        /// </summary>
+        /// <param name="dto">Данные для обновления количества</param>
+        /// <returns>Результат операции обновления</returns>
         [HttpPut]
         public async Task<IActionResult> UpdateQuantity([FromBody] CartItemDTO dto)
         {
             var clientId = GetClientId();
             await _cartService.UpdateQuantityAsync(clientId, dto.DishId, dto.Quantity);
-            return Ok();
+            return Ok("Колличество товара изменено");
         }
 
-        [HttpDelete("items/{dishId}")]
+        /// <summary>
+        /// Удаляет блюдо из корзины
+        /// </summary>
+        /// <param name="dishId">Идентификатор блюда</param>
+        /// <returns>Результат операции удаления</returns>
+        [HttpDelete("{dishId}")]
         public async Task<IActionResult> RemoveFromCart(int dishId)
         {
             var clientId = GetClientId();
             await _cartService.RemoveFromCartAsync(clientId, dishId);
-            return Ok();
+            return Ok("Блюдо убрано из корзины");
         }
 
-        [HttpDelete("clear")]
+        /// <summary>
+        /// Очищает корзину текущего клиента
+        /// </summary>
+        /// <returns>Результат операции очистки</returns>
+        [HttpDelete("all")]
         public async Task<IActionResult> ClearCart()
         {
             var clientId = GetClientId();
             await _cartService.ClearCartAsync(clientId);
-            return Ok();
+            return Ok("Все товары убраны из корзины");
         }
     }
 }

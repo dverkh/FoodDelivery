@@ -1,20 +1,31 @@
 ﻿using FoodDelivery.Domain.Contracts;
-using FoodDelivery.Domain.Models;
 using FoodDelivery.DTO.ClientDTO;
 using FoodDelivery.Storage.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace FoodDelivery.Services
 {
+    /// <summary>
+    /// Сервис для управления данными клиента в системе
+    /// </summary>
     public class ClientService : IClientService
     {
         private readonly FoodDeliveryContext _context;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса клиента
+        /// </summary>
+        /// <param name="context">Контекст базы данных</param>
         public ClientService(FoodDeliveryContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Получает информацию о клиенте по его идентификатору
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <returns>Список данных клиента в формате DTO</returns>
         public async Task<List<ClientResponseDTO>> GetClientAsync(int clientId)
         {
             return await _context.Clients
@@ -28,6 +39,12 @@ namespace FoodDelivery.Services
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Обновляет имя клиента в системе
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="newName">Новое имя клиента</param>
+        /// <returns>Задача, представляющая асинхронную операцию обновления</returns>
         public async Task UpdateNameAsync(int clientId, string newName)
         {
             var client = await _context.Clients.FindAsync(clientId);
@@ -37,9 +54,14 @@ namespace FoodDelivery.Services
             }
 
             await _context.SaveChangesAsync();
-
         }
 
+        /// <summary>
+        /// Обновляет номер телефона клиента в системе
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="newPhone">Новый номер телефона клиента</param>
+        /// <returns>Задача, представляющая асинхронную операцию обновления</returns>
         public async Task UpdatePhoneAsync(int clientId, string newPhone)
         {
             var client = await _context.Clients.FindAsync(clientId);
@@ -49,9 +71,14 @@ namespace FoodDelivery.Services
             }
 
             await _context.SaveChangesAsync();
-
         }
 
+        /// <summary>
+        /// Обновляет пароль клиента после проверки текущего пароля
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="dto">DTO с текущим и новым паролем</param>
+        /// <returns>Строка с результатом операции обновления пароля: "Success", "IncorrectPassword" или "NewPasswordSameAsOld"</returns>
         public async Task<string> UpdatePasswordAsync(int clientId, PasswordUpdateDTO dto)
         {
             var client = await _context.Clients.FindAsync(clientId);
@@ -74,7 +101,6 @@ namespace FoodDelivery.Services
 
             await _context.SaveChangesAsync();
             return "Success";
-
         }
     }
 }

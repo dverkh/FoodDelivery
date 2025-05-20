@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FoodDelivery.Controllers
 {
+    /// <summary>
+    /// Контроллер для управления аутентификацией пользователей
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -14,12 +17,22 @@ namespace FoodDelivery.Controllers
         private readonly IAuthService _authService;
         private readonly IAuthTokenService _authTokenService;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр контроллера аутентификации
+        /// </summary>
+        /// <param name="authService">Сервис аутентификации</param>
+        /// <param name="authTokenService">Сервис управления токенами</param>
         public AuthController(IAuthService authService, IAuthTokenService authTokenService)
         {
             _authService = authService;
             _authTokenService = authTokenService;
         }
 
+        /// <summary>
+        /// Регистрирует нового пользователя в системе
+        /// </summary>
+        /// <param name="dto">Данные для регистрации</param>
+        /// <returns>Токены доступа при успешной регистрации или ошибку, если пользователь существует</returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
@@ -28,6 +41,11 @@ namespace FoodDelivery.Controllers
             return Ok(tokens);
         }
 
+        /// <summary>
+        /// Выполняет вход пользователя в систему
+        /// </summary>
+        /// <param name="dto">Учетные данные пользователя</param>
+        /// <returns>Токены доступа при успешной аутентификации или ошибку при неверных учетных данных</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
@@ -36,6 +54,11 @@ namespace FoodDelivery.Controllers
             return Ok(tokens);
         }
 
+        /// <summary>
+        /// Выполняет выход пользователя из системы
+        /// </summary>
+        /// <param name="refreshToken">Токен обновления для отзыва</param>
+        /// <returns>Успешный результат операции</returns>
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] string refreshToken)
         {
@@ -43,7 +66,12 @@ namespace FoodDelivery.Controllers
             return Ok();
         }
 
-        [HttpPost("refresh")]
+        /// <summary>
+        /// Обновляет токен доступа с помощью токена обновления
+        /// </summary>
+        /// <param name="refreshToken">Токен обновления</param>
+        /// <returns>Новые токены доступа или ошибку при невалидном токене</returns>
+        [HttpPost("tokenRefresh")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
             if (await _authTokenService.IsTokenRevokedAsync(refreshToken))
@@ -85,7 +113,7 @@ namespace FoodDelivery.Controllers
             }
             catch
             {
-                return Unauthorized("Невалидный токен");
+                return Unauthorized("Неизвестная ошибка");
             }
         }
     }

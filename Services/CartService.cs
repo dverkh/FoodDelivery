@@ -4,18 +4,29 @@ using FoodDelivery.Storage.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.DTO.CartDTO;
 
-
 namespace FoodDelivery.Services
 {
+    /// <summary>
+    /// Реализация сервиса для управления корзиной покупок клиента
+    /// </summary>
     public class CartService : ICartService
     {
         private readonly FoodDeliveryContext _context;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса корзины
+        /// </summary>
+        /// <param name="context">Контекст базы данных</param>
         public CartService(FoodDeliveryContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Получает содержимое корзины клиента
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <returns>Список товаров в корзине</returns>
         public async Task<List<CartResponseDTO>> GetCartAsync(int clientId)
         {
             return await _context.CartItems
@@ -31,6 +42,11 @@ namespace FoodDelivery.Services
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Добавляет блюдо в корзину клиента
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="dishId">Идентификатор блюда</param>
         public async Task AddToCartAsync(int clientId, int dishId)
         {
             var existingItem = await _context.CartItems.FindAsync(clientId, dishId);
@@ -54,6 +70,12 @@ namespace FoodDelivery.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Обновляет количество блюда в корзине
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="dishId">Идентификатор блюда</param>
+        /// <param name="quantity">Новое количество</param>
         public async Task UpdateQuantityAsync(int clientId, int dishId, int quantity)
         {
             var item = await _context.CartItems.FindAsync(clientId, dishId);
@@ -69,6 +91,11 @@ namespace FoodDelivery.Services
             }
         }
 
+        /// <summary>
+        /// Удаляет блюдо из корзины
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
+        /// <param name="dishId">Идентификатор блюда</param>
         public async Task RemoveFromCartAsync(int clientId, int dishId)
         {
             var item = await _context.CartItems.FindAsync(clientId, dishId);
@@ -79,6 +106,10 @@ namespace FoodDelivery.Services
             }
         }
 
+        /// <summary>
+        /// Очищает корзину клиента
+        /// </summary>
+        /// <param name="clientId">Идентификатор клиента</param>
         public async Task ClearCartAsync(int clientId)
         {
             var items = _context.CartItems.Where(x => x.ClientId == clientId);

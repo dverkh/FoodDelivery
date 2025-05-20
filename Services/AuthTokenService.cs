@@ -9,13 +9,27 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FoodDelivery.Services
 {
+    /// <summary>
+    /// Реализация сервиса для работы с токенами аутентификации
+    /// </summary>
     public class AuthTokenService : IAuthTokenService
     {
         private readonly FoodDeliveryContext _context;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр сервиса токенов
+        /// </summary>
+        /// <param name="context">Контекст базы данных</param>
         public AuthTokenService(FoodDeliveryContext context)
         {
             _context = context;
         }
+
+        /// <summary>
+        /// Получает список утверждений (claims) для пользователя
+        /// </summary>
+        /// <param name="user">Данные клиента</param>
+        /// <returns>Список утверждений для генерации токенов</returns>
         public List<Claim> GetClaims(Client user)
         {
             return new List<Claim>
@@ -29,6 +43,11 @@ namespace FoodDelivery.Services
             };
         }
 
+        /// <summary>
+        /// Генерирует токен доступа на основе утверждений
+        /// </summary>
+        /// <param name="claims">Список утверждений</param>
+        /// <returns>Токен доступа</returns>
         public string GenerateAccessToken(List<Claim> claims)
         {
             var token = new JwtSecurityToken(
@@ -45,6 +64,11 @@ namespace FoodDelivery.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        /// <summary>
+        /// Генерирует токен обновления на основе утверждений
+        /// </summary>
+        /// <param name="claims">Список утверждений</param>
+        /// <returns>Токен обновления</returns>
         public string GenerateRefreshToken(List<Claim> claims)
         {
             var token = new JwtSecurityToken(
@@ -61,6 +85,11 @@ namespace FoodDelivery.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        /// <summary>
+        /// Проверяет валидность утверждений токена
+        /// </summary>
+        /// <param name="claims">Список утверждений для проверки</param>
+        /// <returns>true если утверждения валидны, иначе false</returns>
         public async Task<bool> ValidateTokenClaimsAsync(List<Claim> claims)
         {
             var userIdClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -87,6 +116,10 @@ namespace FoodDelivery.Services
             return true;
         }
 
+        /// <summary>
+        /// Отзывает токен
+        /// </summary>
+        /// <param name="token">Токен для отзыва</param>
         public async Task RevokeTokenAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -104,6 +137,11 @@ namespace FoodDelivery.Services
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Проверяет, был ли токен отозван
+        /// </summary>
+        /// <param name="token">Токен для проверки</param>
+        /// <returns>true если токен отозван, иначе false</returns>
         public async Task<bool> IsTokenRevokedAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -114,6 +152,9 @@ namespace FoodDelivery.Services
                 .AnyAsync(t => t.Jti == jti && t.Expiration > DateTime.UtcNow);
         }
 
+        /// <summary>
+        /// Очищает истекшие отозванные токены из базы данных
+        /// </summary>
         public async Task CleanupExpiredTokensAsync()
         {
             var expiredTokens = _context.RevokedTokens
