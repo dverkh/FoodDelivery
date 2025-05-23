@@ -74,12 +74,11 @@ namespace FoodDelivery.Services
             var accessToken = _authTokenService.GenerateAccessToken(claims); 
             var refreshToken = _authTokenService.GenerateRefreshToken(claims);
 
-            var response = new AuthTokenResponseDTO
+            return new AuthTokenResponseDTO
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
-            return response;
         }
     }
 }

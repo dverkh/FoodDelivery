@@ -9,6 +9,13 @@ namespace FoodDelivery.Domain.Contracts
     public interface IOrderService
     {
         /// <summary>
+        /// Получает заказ с указанным идентификатором
+        /// </summary>
+        /// <param name="orderId">Идентификатор заказа</param>
+        /// <returns>Заказ с указанным идентификатором</returns>
+        Task<OrderResponseDTO?> GetOrderByIdAsync(int orderId);
+
+        /// <summary>
         /// Создает новый заказ на основе содержимого корзины клиента
         /// </summary>
         /// <param name="dto">Данные для создания заказа</param>
@@ -19,22 +26,22 @@ namespace FoodDelivery.Domain.Contracts
         /// Отмечает заказ как оплаченный
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        Task<bool> OrderPayAsync(int orderId);
+        /// <returns>Обновленный заказ</returns>
+        Task<OrderResponseDTO?> OrderPayAsync(int orderId);
 
         /// <summary>
         /// Отменяет заказ
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если заказ успешно отменен, иначе false</returns>
-        Task<bool> CancelOrderAsync(int orderId);
+        /// <returns>Обновленный заказ</returns>
+        Task<OrderResponseDTO?> CancelOrderAsync(int orderId);
 
         /// <summary>
         /// Отмечает заказ как доставленный
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        Task<bool> OrderDeliveredAsync(int orderId);
+        /// <returns>Обновленный заказ</returns>
+        Task<OrderResponseDTO?> OrderDeliveredAsync(int orderId);
 
         /// <summary>
         /// Получает список всех заказов клиента
@@ -53,7 +60,7 @@ namespace FoodDelivery.Domain.Contracts
         /// Отмечает заказ как переданный курьеру
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        Task<bool> OrderGivenToCourierAsync(int orderId, int courierId);
+        /// <returns>Обновленный заказ</returns>
+        Task<OrderResponseDTO?> OrderGivenToCourierAsync(int orderId, int courierId);
     }
 }

@@ -27,7 +27,7 @@ namespace FoodDelivery.Storage.EntityConfigurations
 
             builder.Property(c => c.Phone)
                 .IsRequired(false)
-                .HasMaxLength(10);
+                .HasMaxLength(20);
 
             builder.HasMany(c => c.Orders)
                 .WithOne(o => o.Client)

@@ -22,16 +22,25 @@ namespace FoodDelivery.Services
         /// Получает список всех блюд
         /// </summary>
         /// <returns>Коллекция всех блюд в меню</returns>
-        public async Task<IEnumerable<Dish>> GetAllAsync()
+        public async Task<List<DishDTO>> GetAllAsync()
         {
-            return await _context.Dishes.ToListAsync();
+            return await _context.Dishes
+                .Select(d => new DishDTO
+                {
+                    Name = d.Name,
+                    CategoryId = d.CategoryId,
+                    Description = d.Description,
+                    Price = d.Price,
+                    IsAvailable = d.IsAvailable
+                })
+                .ToListAsync();
         }
 
         /// <summary>
         /// Добавляет новое блюдо в меню
         /// </summary>
         /// <param name="dishDto">Данные нового блюда</param>
-        public async Task AddDishAsync(DishDTO dishDto)
+        public async Task<List<DishDTO>> AddDishAsync(DishDTO dishDto)
         {
             var dish = new Dish
             {
@@ -44,6 +53,8 @@ namespace FoodDelivery.Services
 
             _context.Dishes.Add(dish);
             await _context.SaveChangesAsync();
+
+            return await GetAllAsync();
         }
 
         /// <summary>
@@ -52,11 +63,13 @@ namespace FoodDelivery.Services
         /// <param name="id">Идентификатор блюда</param>
         /// <param name="dishDto">Новые данные блюда</param>
         /// <exception cref="Exception">Возникает, если блюдо не найдено</exception>
-        public async Task UpdateDishAsync(int id, DishDTO dishDto)
+        public async Task<List<DishDTO>> UpdateDishAsync(int id, DishDTO dishDto)
         {
             var dish = await _context.Dishes.FindAsync(id);
-            if (dish == null)
-                throw new Exception();
+            if (dish == null) 
+            {
+                throw new KeyNotFoundException("Блюдо не найдено");
+            }
 
             dish.Name = dishDto.Name;
             dish.CategoryId = dishDto.CategoryId;
@@ -65,6 +78,8 @@ namespace FoodDelivery.Services
             dish.IsAvailable = dishDto.IsAvailable;
 
             await _context.SaveChangesAsync();
+
+            return await GetAllAsync();
         }
 
         /// <summary>

@@ -29,10 +29,10 @@ namespace FoodDelivery.Controllers
         /// </summary>
         /// <returns>Коллекция всех доступных блюд</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Dish>>> GetDishes()
+        public async Task<IActionResult> GetDishes()
         {
-            var dishes = await _dishService.GetAllAsync();
-            return Ok(dishes);
+            var menu = await _dishService.GetAllAsync();
+            return Ok(menu);
         }
 
         /// <summary>
@@ -44,8 +44,8 @@ namespace FoodDelivery.Controllers
         [HttpPost("dish")]
         public async Task<IActionResult> AddDish([FromBody] DishDTO dishDto)
         {
-            await _dishService.AddDishAsync(dishDto);
-            return Ok("Блядо добавлено в меню");
+            var updatedMenu = await _dishService.AddDishAsync(dishDto);
+            return Ok(updatedMenu);
         }
 
         /// <summary>
@@ -73,12 +73,12 @@ namespace FoodDelivery.Controllers
         {
             try
             {
-                await _dishService.UpdateDishAsync(dishId, dishDto);
-                return Ok("Блюда обновлено");
+                var updatedMenu = await _dishService.UpdateDishAsync(dishId, dishDto);
+                return Ok(updatedMenu);
             }
-            catch (Exception ex)
+            catch (KeyNotFoundException)
             {
-                return NotFound(ex.Message);
+                return NotFound("Блюдо не найдено");
             }
         }
 

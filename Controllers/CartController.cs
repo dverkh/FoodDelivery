@@ -52,8 +52,8 @@ namespace FoodDelivery.Controllers
         public async Task<IActionResult> AddToCart(int dishId)
         {
             var clientId = GetClientId();
-            await _cartService.AddToCartAsync(clientId, dishId);
-            return Ok("Блюдо добавлено в корзину");
+            var cart = await _cartService.AddToCartAsync(clientId, dishId);
+            return Ok(cart);
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace FoodDelivery.Controllers
         public async Task<IActionResult> UpdateQuantity([FromBody] CartItemDTO dto)
         {
             var clientId = GetClientId();
-            await _cartService.UpdateQuantityAsync(clientId, dto.DishId, dto.Quantity);
-            return Ok("Колличество товара изменено");
+            var cart = await _cartService.UpdateQuantityAsync(clientId, dto.DishId, dto.Quantity);
+            return Ok(cart);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace FoodDelivery.Controllers
         public async Task<IActionResult> RemoveFromCart(int dishId)
         {
             var clientId = GetClientId();
-            await _cartService.RemoveFromCartAsync(clientId, dishId);
-            return Ok("Блюдо убрано из корзины");
+            var cart = await _cartService.RemoveFromCartAsync(clientId, dishId);
+            return Ok(cart);
         }
 
         /// <summary>
@@ -90,8 +90,8 @@ namespace FoodDelivery.Controllers
         public async Task<IActionResult> ClearCart()
         {
             var clientId = GetClientId();
-            await _cartService.ClearCartAsync(clientId);
-            return Ok("Все товары убраны из корзины");
+            var cart = await _cartService.ClearCartAsync(clientId);
+            return Ok(cart);
         }
     }
 }

@@ -12,20 +12,20 @@ namespace FoodDelivery.Domain.Contracts
         /// Получает список всех блюд
         /// </summary>
         /// <returns>Коллекция всех блюд в меню</returns>
-        Task<IEnumerable<Dish>> GetAllAsync();
+        Task<List<DishDTO>> GetAllAsync();
 
         /// <summary>
         /// Добавляет новое блюдо в меню
         /// </summary>
         /// <param name="dish">Данные нового блюда</param>
-        Task AddDishAsync(DishDTO dish);
+        Task<List<DishDTO>> AddDishAsync(DishDTO dish);
 
         /// <summary>
         /// Обновляет информацию о блюде
         /// </summary>
         /// <param name="id">Идентификатор блюда</param>
         /// <param name="dish">Новые данные блюда</param>
-        Task UpdateDishAsync(int id, DishDTO dish);
+        Task<List<DishDTO>> UpdateDishAsync(int id, DishDTO dish);
 
         /// <summary>
         /// Добавляет новую категорию блюд

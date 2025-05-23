@@ -7,6 +7,7 @@
         public decimal TotalPrice { get; set; }
         public DateTime DateTime { get; set; }
         public string DeliveryAddress { get; set; }
+        public int? CourierId { get; set; }
         public List<OrderItemDTO> Items { get; set; }
     }
 }

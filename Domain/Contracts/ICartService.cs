@@ -19,7 +19,7 @@ namespace FoodDelivery.Domain.Contracts
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
-        Task AddToCartAsync(int clientId, int dishId);
+        Task<List<CartResponseDTO>> AddToCartAsync(int clientId, int dishId);
 
         /// <summary>
         /// Обновляет количество блюда в корзине
@@ -27,19 +27,19 @@ namespace FoodDelivery.Domain.Contracts
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
         /// <param name="quantity">Новое количество</param>
-        Task UpdateQuantityAsync(int clientId, int dishId, int quantity);
+        Task<List<CartResponseDTO>> UpdateQuantityAsync(int clientId, int dishId, int quantity);
 
         /// <summary>
         /// Удаляет блюдо из корзины
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
-        Task RemoveFromCartAsync(int clientId, int dishId);
+        Task<List<CartResponseDTO>> RemoveFromCartAsync(int clientId, int dishId);
 
         /// <summary>
         /// Очищает корзину клиента
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
-        Task ClearCartAsync(int clientId);
+        Task<List<CartResponseDTO>> ClearCartAsync(int clientId);
     }
 }

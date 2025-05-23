@@ -21,6 +21,38 @@ namespace FoodDelivery.Services
         }
 
         /// <summary>
+        /// Получает заказ с указанным идентификатором
+        /// </summary>
+        /// <param name="orderId">Идентификатор заказа</param>
+        /// <returns>Заказ с указанным идентификатором</returns>
+        public async Task<OrderResponseDTO?> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Dish)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null) return null;
+
+            return new OrderResponseDTO
+            {
+                OrderId = order.OrderId,
+                Status = order.Status,
+                TotalPrice = order.TotalPrice,
+                DateTime = order.DateTime,
+                DeliveryAddress = order.DeliveryAddress,
+                CourierId = order.CourierId,
+                Items = order.OrderDetails.Select(od => new OrderItemDTO
+                {
+                    DishId = od.DishId,
+                    DishName = od.Dish.Name,
+                    Quantity = od.Quantity,
+                    Price = od.Dish.Price
+                }).ToList()
+            };
+        }
+
+        /// <summary>
         /// Создает новый заказ на основе содержимого корзины клиента
         /// </summary>
         /// <param name="dto">Данные для создания заказа</param>
@@ -47,6 +79,7 @@ namespace FoodDelivery.Services
                 TotalPrice = totalPrice,
                 DateTime = DateTime.UtcNow,
                 DeliveryAddress = dto.DeliveryAddress,
+                CourierId = null,
                 OrderDetails = cartItems.Select(x => new OrderDetails
                 {
                     DishId = x.DishId,
@@ -67,6 +100,7 @@ namespace FoodDelivery.Services
                 TotalPrice = order.TotalPrice,
                 DateTime = order.DateTime,
                 DeliveryAddress = order.DeliveryAddress,
+                CourierId = order.CourierId,
                 Items = order.OrderDetails.Select(x => new OrderItemDTO
                 {
                     DishId = x.DishId,
@@ -81,48 +115,49 @@ namespace FoodDelivery.Services
         /// Отмечает заказ как оплаченный
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        public async Task<bool> OrderPayAsync(int orderId)
+        /// <returns>Обновленный заказ</returns>
+        public async Task<OrderResponseDTO?> OrderPayAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status != "Создан")
-                return false;
+                return null;
 
             order.Status = "Оплачен";
             await _context.SaveChangesAsync();
-            return true;
+            return await GetOrderByIdAsync(orderId);
         }
+
 
         /// <summary>
         /// Отменяет заказ
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если заказ успешно отменен, иначе false</returns>
-        public async Task<bool> CancelOrderAsync(int orderId)
+        /// <returns>Обновленный заказ</returns>
+        public async Task<OrderResponseDTO?> CancelOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status == "Доставлен")
-                return false;
+                return null;
 
             order.Status = "Отменен";
             await _context.SaveChangesAsync();
-            return true;
+            return await GetOrderByIdAsync(orderId);
         }
 
         /// <summary>
         /// Отмечает заказ как доставленный
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        public async Task<bool> OrderDeliveredAsync(int orderId)
+        /// <returns>Обновленный заказ</returns>
+        public async Task<OrderResponseDTO?> OrderDeliveredAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status != "Оплачен")
-                return false;
+                return null;
 
             order.Status = "Доставлен";
             await _context.SaveChangesAsync();
-            return true;
+            return await GetOrderByIdAsync(orderId);
         }
 
         /// <summary>
@@ -146,6 +181,7 @@ namespace FoodDelivery.Services
                 TotalPrice = order.TotalPrice,
                 DateTime = order.DateTime,
                 DeliveryAddress = order.DeliveryAddress,
+                CourierId = order.CourierId,
                 Items = order.OrderDetails.Select(od => new OrderItemDTO
                 {
                     DishId = od.DishId,
@@ -175,6 +211,7 @@ namespace FoodDelivery.Services
                 Status = o.Status,
                 DateTime = o.DateTime,
                 DeliveryAddress = o.DeliveryAddress,
+                CourierId = o.CourierId,
                 Items = o.OrderDetails.Select(od => new OrderItemDTO
                 {
                     DishId = od.DishId,
@@ -189,21 +226,21 @@ namespace FoodDelivery.Services
         /// </summary>
         /// <param name="orderId">Идентификатор заказа</param>
         /// /// <param name="courierId">Идентификатор курьера</param>
-        /// <returns>true если статус успешно обновлен, иначе false</returns>
-        public async Task<bool> OrderGivenToCourierAsync(int orderId, int courierId)
+        /// <returns>Обновленный заказ</returns>
+        public async Task<OrderResponseDTO?> OrderGivenToCourierAsync(int orderId, int courierId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null || order.Status != "Оплачен")
-                return false;
+                return null;
 
             var courierExists = await _context.Couriers.AnyAsync(c => c.CourierId == courierId);
             if (!courierExists)
-                return false;
+                return null;
 
             order.Status = "Передан курьеру";
             order.CourierId = courierId;
             await _context.SaveChangesAsync();
-            return true;
+            return await GetOrderByIdAsync(orderId);
         }
     }
 }

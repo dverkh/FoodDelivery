@@ -79,8 +79,8 @@ namespace FoodDelivery.Controllers
         [HttpPut("{orderId}/pay")]
         public async Task<IActionResult> MarkOrderAsPaid(int orderId)
         {
-            return await _orderService.OrderPayAsync(orderId)
-                ? Ok("Заказ успешно оплачен") : BadRequest("Ошибка оплаты");
+            var result = await _orderService.OrderPayAsync(orderId);
+            return result != null ? Ok(result) : BadRequest("Ошибка оплаты");
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace FoodDelivery.Controllers
         [HttpPut("{orderId}/cancel")]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
-            return await _orderService.CancelOrderAsync(orderId)
-                ? Ok("Заказ отменен") : BadRequest();
+            var result = await _orderService.CancelOrderAsync(orderId);
+            return result != null ? Ok(result) : BadRequest("Невозможно отменить заказ");
         }
 
         /// <summary>
@@ -105,8 +105,8 @@ namespace FoodDelivery.Controllers
         [HttpPut("{orderId}/courier")]
         public async Task<IActionResult> OrderGivenToCourier(int orderId, [FromQuery] int courierId)
         {
-            return await _orderService.OrderGivenToCourierAsync(orderId, courierId)
-                ? Ok("Заказ отмечен как переданный курьеру") : BadRequest();
+            var result = await _orderService.OrderGivenToCourierAsync(orderId, courierId);
+            return result != null ? Ok(result) : BadRequest("Ошибка передачи заказа курьеру");
         }
 
         /// <summary>
@@ -118,8 +118,8 @@ namespace FoodDelivery.Controllers
         [HttpPut("{orderId}/deliver")]
         public async Task<IActionResult> MarkOrdeAsrDelivered(int orderId)
         {
-            return await _orderService.OrderDeliveredAsync(orderId)
-                ? Ok("Заказ отмечен как доставленный") : BadRequest();
+            var result = await _orderService.OrderDeliveredAsync(orderId);
+            return result != null ? Ok(result) : BadRequest("Ошибка доставки");
         }
     }
 }

@@ -43,7 +43,7 @@ namespace FoodDelivery.Services
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
-        public async Task AddToCartAsync(int clientId, int dishId)
+        public async Task<List<CartResponseDTO>> AddToCartAsync(int clientId, int dishId)
         {
             var existingItem = await _context.CartItems.FindAsync(clientId, dishId);
 
@@ -64,6 +64,7 @@ namespace FoodDelivery.Services
             }
 
             await _context.SaveChangesAsync();
+            return await GetCartAsync(clientId);
         }
 
         /// <summary>
@@ -72,19 +73,21 @@ namespace FoodDelivery.Services
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
         /// <param name="quantity">Новое количество</param>
-        public async Task UpdateQuantityAsync(int clientId, int dishId, int quantity)
+        public async Task<List<CartResponseDTO>> UpdateQuantityAsync(int clientId, int dishId, int quantity)
         {
             var item = await _context.CartItems.FindAsync(clientId, dishId);
-            if (item != null)
+            if (item == null)
             {
-                item.Quantity = quantity;
-                if (item.Quantity <= 0)
-                {
-                    _context.CartItems.Remove(item);
-                }
-
-                await _context.SaveChangesAsync();
+                throw new KeyNotFoundException("Блюдо в корзине не найдено");
             }
+            item.Quantity = quantity;
+            if (item.Quantity <= 0)
+            {
+                _context.CartItems.Remove(item);
+            }
+
+            await _context.SaveChangesAsync();
+            return await GetCartAsync(clientId);
         }
 
         /// <summary>
@@ -92,25 +95,28 @@ namespace FoodDelivery.Services
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
         /// <param name="dishId">Идентификатор блюда</param>
-        public async Task RemoveFromCartAsync(int clientId, int dishId)
+        public async Task<List<CartResponseDTO>> RemoveFromCartAsync(int clientId, int dishId)
         {
             var item = await _context.CartItems.FindAsync(clientId, dishId);
             if (item != null)
             {
                 _context.CartItems.Remove(item);
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
+            return await GetCartAsync(clientId);
         }
 
         /// <summary>
         /// Очищает корзину клиента
         /// </summary>
         /// <param name="clientId">Идентификатор клиента</param>
-        public async Task ClearCartAsync(int clientId)
+        public async Task<List<CartResponseDTO>> ClearCartAsync(int clientId)
         {
             var items = _context.CartItems.Where(x => x.ClientId == clientId);
             _context.CartItems.RemoveRange(items);
             await _context.SaveChangesAsync();
+            return await GetCartAsync(clientId);
         }
     }
 }
